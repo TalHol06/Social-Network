@@ -1,19 +1,14 @@
 import mongoose, { Schema, Model, type Document } from 'mongoose';
 
 interface IUser extends Document{
-  id: number,
   username: string;
   email: string;
-  thoughts: Schema.Types.ObjectId[];
-  friends?: Schema.Types.ObjectId[];
-  friendCount: number;
+  thoughts: mongoose.Schema.Types.ObjectId[];
+  friends?: mongoose.Schema.Types.ObjectId[];
 }
 
 const UserSchema = new Schema<IUser>(
   {
-    id: {
-      autoIncrement: true
-    },
     username: {
       type: String,
       unique: true,
@@ -24,10 +19,10 @@ const UserSchema = new Schema<IUser>(
       type: String,
       unique: true,
       required: true,
-      validator: function(e){
-        return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(e);
+      validate: {
+        validator: (e: string) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(e),
+        message: 'Please enter a valid email',
       },
-      message: 'PLease enter a valid email',
       trim: true
     },
     thoughts: [
@@ -47,13 +42,13 @@ const UserSchema = new Schema<IUser>(
     toJSON: {
       virtuals: true,
     },
-    // id: false
+    id: false,
   }
 );
 
 // Virtual for friendCount
 UserSchema.virtual('friendCount').get(function(this: IUser){
-  return this.friends.length;
+  return this.friends?.length || 0;
 });
 
 // Creates the User model
