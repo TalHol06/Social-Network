@@ -11,3 +11,4 @@ const db = async () => {
     }
 };
 export default db;
+//# sourceMappingURL=connection.js.map

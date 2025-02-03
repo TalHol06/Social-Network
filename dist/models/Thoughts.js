@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 const reactionSchema = new Schema({
-    reactionText: {
+    reactionBody: {
         type: String,
         required: true,
         minlength: 1,
@@ -15,6 +15,9 @@ const reactionSchema = new Schema({
         default: Date.now
     }
 }, {
+    toJSON: {
+        getters: true
+    },
     id: false
 });
 const ThoughtsSchema = new Schema({
@@ -45,8 +48,6 @@ const ThoughtsSchema = new Schema({
 ThoughtsSchema.virtual('reactionCount').get(function () {
     return this.reactions?.length || 0;
 });
-ThoughtsSchema.methods.getDateCreated = function () {
-    return this.createdAt;
-};
 const Thought = mongoose.model('Thought', ThoughtsSchema);
 export default Thought;
+//# sourceMappingURL=Thoughts.js.map

@@ -4,7 +4,7 @@ interface IUser extends Document{
   username: string;
   email: string;
   thoughts: mongoose.Schema.Types.ObjectId[];
-  friends?: mongoose.Schema.Types.ObjectId[];
+  friends?: IUser[];
 }
 
 const UserSchema = new Schema<IUser>(

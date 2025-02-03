@@ -41,3 +41,4 @@ UserSchema.virtual('friendCount').get(function () {
 // Creates the User model
 const User = mongoose.model('User', UserSchema);
 export default User;
+//# sourceMappingURL=User.js.map

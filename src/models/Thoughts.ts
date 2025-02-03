@@ -1,14 +1,14 @@
 import mongoose, { Schema, Model, type Document } from 'mongoose';
 
 interface IReaction{
-  reactionText: string;
+  reactionBody: string;
   username: string;
   createdAt: Date;
 }
 
 const reactionSchema = new Schema<IReaction>(
   {
-    reactionText: {
+    reactionBody: {
       type: String,
       required: true,
       minlength: 1,
@@ -24,13 +24,16 @@ const reactionSchema = new Schema<IReaction>(
     }
   },
   {
+    toJSON: {
+      getters: true
+    },
     id: false
   }
 );
 
 interface IThoughts extends Document{
   thoughtText: string;
-  createdAt: Date;
+  createdAt?: Date;
   username: string;
   reactions?: mongoose.Schema.Types.ObjectId[];
 }
@@ -68,10 +71,6 @@ const ThoughtsSchema = new Schema<IThoughts>(
 ThoughtsSchema.virtual('reactionCount').get(function (this: IThoughts){
     return this.reactions?.length || 0;
 });
-
-ThoughtsSchema.methods.getDateCreated = function(): Date{
-  return this.createdAt;
-}
 
 const Thought: Model<IThoughts> = mongoose.model<IThoughts>('Thought', ThoughtsSchema);
 export default Thought;
