@@ -21,7 +21,7 @@
     "noFallthroughCasesInSwitch": true,
     "exactOptionalPropertyTypes": true,
     "noImplicitReturns": true,
-    "noImplicitOverride": true,
+    "noImplicitOverride": false,
     "useUnknownInCatchVariables": true
   },
   "include": ["src/**/*"]

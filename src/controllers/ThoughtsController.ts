@@ -1,44 +1,44 @@
 import { Request, Response } from "express";
 import { Thought, User } from "../models/index.js";
 
-// Get all Thoughts
-export const getThoughts = async (_req: Request, res: Response) => {
+
+
+export const getThoughts = async (_req: any, res: any): Promise<void> => {
   try {
     const thoughts = await Thought.find();
-    return res.json(thoughts);
-  } catch (err: any) {
-    return res.status(404).json({ message: err.message });
+    res.json(thoughts);
+  } catch (err: any){
+    console.log(err);
   }
 }
 
 // Get thought by Id
-export const getThought = async (req: Request, res: Response) => {
+export const getThought = async (req: any, res: any): Promise<void> => {
   const { thoughtId } = req.params;
   try{
     const thought = await Thought.findById(thoughtId);
     if (!thought){
-      return res.status(404).json({ message: 'Thought by that Id not found' });
+      res.status(404).json({ message: 'Thought by that Id not found' });
     } else{
-      return res.json(thought);
+      res.json(thought);
     }
   } catch (err: any){
-    return res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 }
 
 // Create a new Thought
-export const createThought = async (req: Request, res: Response) => {
+export const createThought = async (req: Request, res: Response): Promise<void> => {
   const { thoughtText, username } = req.body;
   const { userId } = req.params;
-  // console.log(userId);
   try {
     if (!thoughtText || !username){
-      return res.status(400).json({ message: 'thoughtText and username is required.' });
+      res.status(400).json({ message: 'thoughtText and username is required.' });
     }
 
     const user = await User.findById(userId);
     if(!user){
-      return res.status(404).json({ message: 'User by that id not found.' });
+      res.status(404).json({ message: 'User by that id not found.' });
     }
 
     const newThought = await Thought.create({
@@ -52,54 +52,54 @@ export const createThought = async (req: Request, res: Response) => {
       {new: true}
     ).populate('thoughts');
 
-    return res.status(201).json({thought: newThought, user: updatedUser });
+    res.status(201).json({thought: newThought, user: updatedUser });
   } catch (err: any) {
-    return res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 }
 
 // Update Thought
-export const updateThought = async (req: Request, res: Response) => {
+export const updateThought = async (req: Request, res: Response): Promise<void> => {
   const { thoughtId } = req.params;
-  const { newThought } = req.body;
   try {
     const updatedThought = await Thought.findByIdAndUpdate(
       thoughtId,
-      newThought,
-      { new: true }
+      req.body,
+      { new: true, runValidators: true }
     );
 
     if (!updatedThought){
-      return res.status(404).json({ message: 'Thought does not exist.' });
+      res.status(404).json({ message: 'Thought does not exist.' });
     }
-    return res.json(updatedThought);
+    res.json(updatedThought);
   } catch (err: any) {
-    return res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 }
 
 // Delete Thought
-export const deleteThought = async (req: Request, res: Response) => {
-  const { thoughtId } =req.params;
+export const deleteThought = async (req: Request, res: Response): Promise<void> => {
+  const { thoughtId, userId } = req.params;
   try {
     const thought = await Thought.findByIdAndDelete(thoughtId);
     if (!thought){
-      return res.status(404).json({ message: 'Thought does not exist.' });
+      res.status(404).json({ message: 'Thought does not exist.' });
     }
 
     await User.findByIdAndUpdate(
-      { thoughts: thought._id },
-      { $pull: { thoughts: thought._id } }
+      userId,
+      { $pull: { thoughts: thoughtId } },
+      { new: true }
     );
 
-    return res.json({ message: 'Thought deleted!' });
+    res.json({ message: 'Thought deleted!' });
   } catch (err: any) {
-    return res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 }
 
 // Create a new Reaction
-export const addReaction = async (req: Request, res: Response) => {
+export const addReaction = async (req: Request, res: Response): Promise<void> => {
   const { thoughtId } = req.params;
   try {
     const thought = await Thought.findByIdAndUpdate(
@@ -109,30 +109,30 @@ export const addReaction = async (req: Request, res: Response) => {
     );
 
     if (!thought){
-      return res.status(404).json({ message: "Thought not found." });
+      res.status(404).json({ message: "Thought not found." });
     }
-    return res.json(thought);
+    res.json(thought);
   } catch (err: any) {
-    return res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   } 
 }
 
 // Delete a Reaction
-export const removeReaction = async (req: Request, res: Response) => {
+export const removeReaction = async (req: Request, res: Response): Promise<void> => {
   const { thoughtId, reactionId } = req.params;
   try {
     const thought = await Thought.findByIdAndUpdate(
       thoughtId,
-      { $pull: { reactions: { reactionId: reactionId }}},
+      { $pull: { reactions: { _id: reactionId } } },
       { new: true }
     );
 
     if (!thought){
-      return res.status(404).json({ message: 'Thought does not exist.' });
+      res.status(404).json({ message: 'Thought does not exist.' });
     }
 
-    return res.json(thought);
+    res.json(thought);
   } catch (err: any) {
-    return res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 }
