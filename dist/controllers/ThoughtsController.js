@@ -52,7 +52,6 @@ export const updateThought = async (req, res) => {
     const { thoughtId } = req.params;
     try {
         const updatedThought = await Thought.findByIdAndUpdate(thoughtId, req.body, { new: true, runValidators: true });
-        console.log(updatedThought);
         if (!updatedThought) {
             res.status(404).json({ message: 'Thought does not exist.' });
         }
